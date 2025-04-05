@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Tooltip from '@mui/material/Tooltip';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -19,16 +23,25 @@ const navItems = [
   { name: 'Bugs', path: '/bugs' },
 ];
 
-function Header({ isLoggedIn, setIsLoggedIn }) {
+function Header({ isLoggedIn, user, onLogout }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const handleLogin = () => {
-    // This would be replaced with actual authentication logic
-    setIsLoggedIn(!isLoggedIn);
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    handleCloseUserMenu();
+    onLogout();
   };
 
   const drawer = (
@@ -36,19 +49,21 @@ function Header({ isLoggedIn, setIsLoggedIn }) {
       <Typography variant="h6" sx={{ my: 2 }}>
         Prestellation
       </Typography>
-      <List>
-        {navItems.map((item) => (
-          <ListItem key={item.name} disablePadding>
-            <ListItemButton
-              component={RouterLink}
-              to={item.path}
-              sx={{ textAlign: 'center' }}
-            >
-              <ListItemText primary={item.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      {isLoggedIn && (
+        <List>
+          {navItems.map((item) => (
+            <ListItem key={item.name} disablePadding>
+              <ListItemButton
+                component={RouterLink}
+                to={item.path}
+                sx={{ textAlign: 'center' }}
+              >
+                <ListItemText primary={item.name} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Box>
   );
 
@@ -78,21 +93,59 @@ function Header({ isLoggedIn, setIsLoggedIn }) {
           >
             Prestellation
           </Typography>
-          <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-            {navItems.map((item) => (
-              <Button
-                key={item.name}
-                component={RouterLink}
-                to={item.path}
-                sx={{ color: '#fff' }}
+          {isLoggedIn && (
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              {navItems.map((item) => (
+                <Button
+                  key={item.name}
+                  component={RouterLink}
+                  to={item.path}
+                  sx={{ color: '#fff' }}
+                >
+                  {item.name}
+                </Button>
+              ))}
+            </Box>
+          )}
+
+          {isLoggedIn ? (
+            <Box sx={{ flexGrow: 0, ml: 2 }}>
+              <Tooltip title="Account settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt={user?.displayName || 'User'} src="/static/images/avatar/2.jpg">
+                    {user?.displayName?.charAt(0) || 'U'}
+                  </Avatar>
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
               >
-                {item.name}
-              </Button>
-            ))}
-          </Box>
-          <Button color="inherit" onClick={handleLogin}>
-            {isLoggedIn ? 'Logout' : 'Login'}
-          </Button>
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">Profile</Typography>
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>
+                  <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
+              </Menu>
+            </Box>
+          ) : (
+            <Button color="inherit" component={RouterLink} to="/login">
+              Login
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Box component="nav">

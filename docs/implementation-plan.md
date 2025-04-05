@@ -25,12 +25,12 @@ This document outlines the phased implementation plan for the Prestellation proj
 **Goal**: Implement secure authentication with Jira credentials.
 
 **Tasks**:
-- [ ] 2.1: Create Jira authentication service
-- [ ] 2.2: Implement JWT token management
-- [ ] 2.3: Build login UI component
-- [ ] 2.4: Add session management and timeout handling
-- [ ] 2.5: Implement secure storage for tokens
-- [ ] 2.6: Write tests for authentication flow
+- [x] 2.1: Create Jira authentication service
+- [x] 2.2: Implement JWT token management
+- [x] 2.3: Build login UI component
+- [x] 2.4: Add session management and timeout handling
+- [x] 2.5: Implement secure storage for tokens
+- [x] 2.6: Write tests for authentication flow
 
 **Definition of Done**:
 - Users can log in with Jira credentials
