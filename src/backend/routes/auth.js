@@ -38,4 +38,24 @@ router.post('/refresh', authController.refreshToken);
  */
 router.get('/user', authenticateToken, authController.getCurrentUser);
 
+/**
+ * @route   GET /api/auth/mock-oauth
+ * @desc    Mock OAuth 2.0 flow for development/testing
+ * @access  Public
+ */
+router.get('/mock-oauth', (req, res) => {
+  // Get the redirect URI from the query parameters
+  const redirectUri = req.query.redirect_uri;
+
+  if (!redirectUri) {
+    return res.status(400).json({ error: 'Missing redirect_uri parameter' });
+  }
+
+  // Create a mock authorization code
+  const mockCode = 'mock_auth_code_' + Date.now();
+
+  // Redirect back to the callback URL with the mock code
+  res.redirect(`${redirectUri}?code=${mockCode}`);
+});
+
 module.exports = router;

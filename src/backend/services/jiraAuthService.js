@@ -22,16 +22,23 @@ class JiraAuthService {
    * @returns {string} - Authorization URL
    */
   getAuthorizationUrl() {
-    const params = {
-      audience: 'api.atlassian.com',
-      client_id: this.clientId,
-      scope: this.scopes,
-      redirect_uri: this.redirectUri,
-      response_type: 'code',
-      prompt: 'consent'
-    };
+    // For demo purposes, we'll use a mock URL that redirects back to our callback
+    // with a fake code parameter
+    if (process.env.NODE_ENV === 'production') {
+      const params = {
+        audience: 'api.atlassian.com',
+        client_id: this.clientId,
+        scope: this.scopes,
+        redirect_uri: this.redirectUri,
+        response_type: 'code',
+        prompt: 'consent'
+      };
 
-    return `${this.jiraBaseUrl}/authorize?${querystring.stringify(params)}`;
+      return `${this.jiraBaseUrl}/authorize?${querystring.stringify(params)}`;
+    } else {
+      // Mock URL for development/testing
+      return `/api/auth/mock-oauth?redirect_uri=${encodeURIComponent(this.redirectUri)}`;
+    }
   }
 
   /**
@@ -41,6 +48,20 @@ class JiraAuthService {
    */
   async exchangeCodeForToken(code) {
     try {
+      // Check if this is a mock code for development/testing
+      if (code.startsWith('mock_auth_code_') && process.env.NODE_ENV !== 'production') {
+        console.log('Using mock OAuth token for development');
+        // Return mock token data
+        return {
+          success: true,
+          access_token: 'mock_access_token_' + Date.now(),
+          refresh_token: 'mock_refresh_token_' + Date.now(),
+          expires_in: 3600, // 1 hour
+          token_type: 'Bearer'
+        };
+      }
+
+      // Real OAuth flow for production
       const response = await axios.post(`${this.jiraBaseUrl}/oauth/token`, {
         grant_type: 'authorization_code',
         client_id: this.clientId,
@@ -74,6 +95,20 @@ class JiraAuthService {
    */
   async refreshAccessToken(refreshToken) {
     try {
+      // Check if this is a mock token for development/testing
+      if (refreshToken.startsWith('mock_refresh_token_') && process.env.NODE_ENV !== 'production') {
+        console.log('Using mock token refresh for development');
+        // Return mock token data
+        return {
+          success: true,
+          access_token: 'mock_access_token_' + Date.now(),
+          refresh_token: 'mock_refresh_token_' + Date.now(),
+          expires_in: 3600, // 1 hour
+          token_type: 'Bearer'
+        };
+      }
+
+      // Real OAuth flow for production
       const response = await axios.post(`${this.jiraBaseUrl}/oauth/token`, {
         grant_type: 'refresh_token',
         client_id: this.clientId,
@@ -106,6 +141,22 @@ class JiraAuthService {
    */
   async getUserInfo(accessToken) {
     try {
+      // Check if this is a mock token for development/testing
+      if (accessToken.startsWith('mock_access_token_') && process.env.NODE_ENV !== 'production') {
+        console.log('Using mock user info for development');
+        // Return mock user data
+        return {
+          success: true,
+          user: {
+            username: 'demo@example.com',
+            displayName: 'Demo User',
+            accountId: 'mock-account-id',
+            avatarUrl: 'https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/default-avatar.png'
+          }
+        };
+      }
+
+      // Real API call for production
       const response = await axios.get(`${this.jiraApiUrl}/rest/api/3/myself`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,

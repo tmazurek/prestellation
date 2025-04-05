@@ -36,27 +36,29 @@ const authController = {
     try {
       const { code, error } = req.query;
 
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
       // Check for errors in the callback
       if (error) {
-        return res.redirect(`/login?error=${encodeURIComponent(error)}`);
+        return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(error)}`);
       }
 
       if (!code) {
-        return res.redirect('/login?error=No authorization code received');
+        return res.redirect(`${frontendUrl}/login?error=No authorization code received`);
       }
 
       // Exchange the code for an access token
       const tokenResult = await jiraAuthService.exchangeCodeForToken(code);
 
       if (!tokenResult.success) {
-        return res.redirect(`/login?error=${encodeURIComponent(tokenResult.message)}`);
+        return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(tokenResult.message)}`);
       }
 
       // Get user information using the access token
       const userResult = await jiraAuthService.getUserInfo(tokenResult.access_token);
 
       if (!userResult.success) {
-        return res.redirect(`/login?error=${encodeURIComponent(userResult.message)}`);
+        return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent(userResult.message)}`);
       }
 
       // Generate a session token that includes both user info and OAuth tokens
@@ -75,10 +77,10 @@ const authController = {
       });
 
       // Redirect to the dashboard
-      return res.redirect('/');
+      return res.redirect(`${frontendUrl}/`);
     } catch (error) {
       console.error('OAuth callback error:', error);
-      return res.redirect(`/login?error=${encodeURIComponent('Authentication failed')}`);
+      return res.redirect(`${frontendUrl}/login?error=${encodeURIComponent('Authentication failed')}`);
     }
   },
 
@@ -90,11 +92,13 @@ const authController = {
    */
   logout(req, res) {
     try {
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
       // Clear auth cookie
       res.clearCookie('auth_token');
 
       // Redirect to login page
-      return res.redirect('/login');
+      return res.redirect(`${frontendUrl}/login`);
     } catch (error) {
       console.error('Logout error:', error);
       return res.status(500).json({
