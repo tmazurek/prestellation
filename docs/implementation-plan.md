@@ -12,8 +12,8 @@ This document outlines the phased implementation plan for the Prestellation proj
 - [x] 1.2: Configure development environment with hot reloading
 - [x] 1.3: Set up basic Express server
 - [x] 1.4: Create React frontend with Vite
-- [ ] 1.5: Set up ESLint and Prettier for code quality
-- [ ] 1.6: Create comprehensive documentation
+- [x] 1.5: Set up ESLint and Prettier for code quality
+- [x] 1.6: Create comprehensive documentation
 
 **Definition of Done**:
 - Project structure is established

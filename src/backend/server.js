@@ -14,9 +14,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // API Routes
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Prestellation API is running' });
-});
+app.use('/api/health', require('./routes/health'));
 
 // TODO: Add Jira API integration routes
 // app.use('/api/roadmap', require('./routes/roadmap'));
@@ -25,7 +23,7 @@ app.get('/api/health', (req, res) => {
 // Serve static frontend in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../frontend/build')));
-  
+
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../../frontend/build', 'index.html'));
   });
