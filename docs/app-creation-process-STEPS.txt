@@ -1,0 +1,60 @@
+
+STEP 1:
+Ask me one question at a time so we can develop a thorough, step-by-step spec for this idea. Each question should build on my previous answers, and our end goal is to have a detailed specification I can hand off to a developer. Let’s do this iteratively and dig into every relevant detail. Remember, only one question at a time.
+
+Here’s the idea:
+
+TUTAJ POMYSL NA APKE ONE PAGER ALBO COS
+
+
+STEP 2:
+Now that we’ve wrapped up the brainstorming process, can you compile our findings into a comprehensive, developer-ready specification? Include all relevant requirements, architecture choices, data handling details, error handling strategies, and a testing plan so a developer can immediately begin implementation.
+
+Draft a detailed, step-by-step blueprint for building this project. Then, once you have a solid plan, break it down into small, iterative stories that build on each other. Look at these stories and then go another round to break it into small tasks. Review the results and make sure that the tasks are small enough to be implemented safely with strong testing, but big enough to move the project forward. Iterate until you feel that the tasks are right sized for this project.
+
+
+
+Project Approach
+
+    Always check for a PRD (Product Requirements Document) before starting a new task and follow it closely
+    Look for comprehensive project documentation to understand requirements before making changes
+    Focus only on code areas relevant to the assigned task
+    Prefer iterating on existing code rather than creating new solutions
+    Keep solutions simple and avoid introducing unnecessary complexity
+
+Code Quality
+
+    Keep files under 300 lines of code; refactor when approaching this limit
+    Maintain a clean, organized codebase
+    Avoid code duplication by checking for similar existing functionality
+    Write thorough tests for all major functionality
+    Consider different environments (dev, test, prod) when writing code
+    Unless explicitly instructed, instead of trying to gracefully handle an error or failure, make sure to fix the underlying issue.
+
+Development Workflow
+
+    Kill all related running servers before starting a new one
+    Always start a new server after making changes to allow for testing
+    Make only requested changes or changes you're confident are well understood
+    Consider what other code areas might be affected by your changes
+    Don't drastically change existing patterns without explicit instruction
+
+Version Control
+
+    Never leave unstaged/untracked files after committing to git
+    Don't create new branches unless explicitly requested
+    Never commit .env files to version control
+    Never overwrite .env files without first asking and confirming
+
+Best Practices
+
+    Avoid writing one-time scripts in permanent files
+    Don't mock data except for tests (never for dev or prod environments)
+    Exhaust all options using existing implementations before introducing new patterns
+    If introducing a new pattern to replace an old one, remove the old implementation
+
+
+STEP 3:
+From here you should have the foundation to provide a series of prompts for a code-generation LLM that will implement each task in a test-driven manner. Prioritize best practices, incremental progress, and early testing, ensuring no big jumps in complexity at any stage. Make sure that each prompt builds on the previous prompts, and ends with wiring things together. There should be no hanging or orphaned code that isn't integrated into a previous task.
+
+Make sure and separate each prompt section. Use markdown. Each prompt should be tagged as text using code tags. The goal is to output prompts, but context, etc is important as well.
