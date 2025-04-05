@@ -22,21 +22,22 @@ This document outlines the phased implementation plan for the Prestellation proj
 - Code quality tools are configured
 
 ### Story 2: Authentication System
-**Goal**: Implement secure authentication with Jira credentials.
+**Goal**: Implement secure authentication with Jira using OAuth 2.0.
 
 **Tasks**:
-- [x] 2.1: Create Jira authentication service
-- [x] 2.2: Implement JWT token management
-- [x] 2.3: Build login UI component
-- [x] 2.4: Add session management and timeout handling
-- [x] 2.5: Implement secure storage for tokens
+- [x] 2.1: Create Jira OAuth 2.0 authentication service
+- [x] 2.2: Implement JWT token management for session handling
+- [x] 2.3: Build OAuth login UI component
+- [x] 2.4: Add session management and token refresh handling
+- [x] 2.5: Implement secure storage for tokens using HTTP-only cookies
 - [x] 2.6: Write tests for authentication flow
 
 **Definition of Done**:
-- Users can log in with Jira credentials
+- Users can log in with Jira credentials via OAuth 2.0
 - Authentication state persists across sessions
 - Tokens are securely stored and managed
 - Authentication errors are handled gracefully
+- No need for users to manage API tokens
 
 ### Story 3: Jira API Integration
 **Goal**: Create a robust integration with the Jira API.

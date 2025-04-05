@@ -19,7 +19,7 @@ This application provides:
 
 - Node.js (v16 or higher)
 - npm or yarn
-- Jira API access
+- Jira account with administrator access to create an OAuth 2.0 app
 
 ### Installation
 
@@ -37,13 +37,20 @@ This application provides:
    cd ../..
    ```
 
-3. Configure your Jira connection in `.env` file (see `.env.example`)
+3. Set up an OAuth 2.0 app in Atlassian Developer Console:
+   - Go to https://developer.atlassian.com/console/myapps/
+   - Create a new OAuth 2.0 app
+   - Configure the callback URL as `http://localhost:3000/api/auth/callback`
+   - Request the scopes: `read:jira-user` and `read:jira-work`
+   - Copy your Client ID and Client Secret
+
+4. Configure your Jira connection in `.env` file (see `.env.example`)
    ```
    cp .env.example .env
-   # Edit .env with your Jira credentials and settings
+   # Edit .env with your OAuth app credentials and settings
    ```
 
-4. Start the development server:
+5. Start the development server:
    ```
    npm run dev
    ```
@@ -96,7 +103,11 @@ prestellation/
 ## API Endpoints
 
 - `GET /api/health` - Health check endpoint
-- `POST /api/auth/login` - Authenticate with Jira credentials (coming soon)
+- `GET /api/auth/login` - Initiate OAuth 2.0 authentication flow
+- `GET /api/auth/callback` - OAuth 2.0 callback endpoint
+- `GET /api/auth/logout` - Logout and clear session
+- `GET /api/auth/user` - Get current authenticated user
+- `POST /api/auth/refresh` - Refresh authentication token
 - `GET /api/roadmap` - Get roadmap data (coming soon)
 - `GET /api/bugs` - Get bug reporting data (coming soon)
 

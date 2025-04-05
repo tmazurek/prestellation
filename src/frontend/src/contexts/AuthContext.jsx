@@ -5,7 +5,7 @@ import authService from '../services/authService';
 const AuthContext = createContext();
 
 /**
- * Authentication provider component
+ * Authentication provider component for OAuth 2.0
  * @param {Object} props - Component props
  * @returns {JSX.Element} - Provider component
  */
@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
       try {
         setLoading(true);
         const isAuthenticated = await authService.isAuthenticated();
-        
+
         if (isAuthenticated) {
           const { user } = await authService.getCurrentUser();
           setUser(user);
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!user) return;
 
-    // Refresh token every 23 hours (assuming 24 hour expiry)
+    // Refresh token every hour
     const refreshInterval = setInterval(async () => {
       try {
         await authService.refreshToken();
@@ -49,54 +49,28 @@ export function AuthProvider({ children }) {
         // Force logout on refresh failure
         handleLogout();
       }
-    }, 23 * 60 * 60 * 1000);
+    }, 60 * 60 * 1000); // Every hour
 
     return () => clearInterval(refreshInterval);
   }, [user]);
 
   /**
-   * Handle user login
-   * @param {string} username - Jira username or email
-   * @param {string} apiToken - Jira API token
+   * Initiate OAuth login flow
    */
-  const handleLogin = async (username, apiToken) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const result = await authService.login(username, apiToken);
-      
-      if (result.success) {
-        const userData = await authService.getCurrentUser();
-        setUser(userData.user);
-        return { success: true };
-      } else {
-        setError(result.message || 'Login failed');
-        return { success: false, message: result.message };
-      }
-    } catch (err) {
-      const errorMessage = err.message || 'Login failed';
-      setError(errorMessage);
-      return { success: false, message: errorMessage };
-    } finally {
-      setLoading(false);
-    }
+  const initiateLogin = () => {
+    setLoading(true);
+    setError(null);
+    authService.initiateLogin();
   };
 
   /**
    * Handle user logout
    */
-  const handleLogout = async () => {
-    try {
-      setLoading(true);
-      await authService.logout();
-      setUser(null);
-    } catch (err) {
-      console.error('Logout error:', err);
-      setError('Logout failed');
-    } finally {
-      setLoading(false);
-    }
+  const handleLogout = () => {
+    setLoading(true);
+    authService.logout();
+    // The page will be redirected, but we'll set user to null just in case
+    setUser(null);
   };
 
   // Context value
@@ -105,7 +79,7 @@ export function AuthProvider({ children }) {
     loading,
     error,
     isAuthenticated: !!user,
-    login: handleLogin,
+    initiateLogin,
     logout: handleLogout,
   };
 

@@ -10,7 +10,7 @@ This guide provides detailed information for developers working on the Prestella
 - npm or yarn
 - Git
 - Code editor (VS Code recommended)
-- Jira API access
+- Jira account with administrator access to create an OAuth 2.0 app
 
 ### Initial Setup
 
@@ -24,20 +24,27 @@ This guide provides detailed information for developers working on the Prestella
    ```bash
    # Install root dependencies
    npm install
-   
+
    # Install frontend dependencies
    cd src/frontend
    npm install
    cd ../..
    ```
 
-3. Set up environment variables:
+3. Set up an OAuth 2.0 app in Atlassian Developer Console:
+   - Go to https://developer.atlassian.com/console/myapps/
+   - Create a new OAuth 2.0 app
+   - Configure the callback URL as `http://localhost:3000/api/auth/callback`
+   - Request the scopes: `read:jira-user` and `read:jira-work`
+   - Copy your Client ID and Client Secret
+
+4. Set up environment variables:
    ```bash
    cp .env.example .env
-   # Edit .env with your Jira credentials and settings
+   # Edit .env with your OAuth app credentials and settings
    ```
 
-4. Start the development servers:
+5. Start the development servers:
    ```bash
    npm run dev
    ```
@@ -148,8 +155,11 @@ The following environment variables should be set in production:
 - `NODE_ENV=production`
 - `PORT=3000` (or your preferred port)
 - `JIRA_API_URL`
-- `JIRA_API_TOKEN`
-- `JIRA_USERNAME`
+- `JIRA_BASE_URL`
+- `JIRA_CLIENT_ID`
+- `JIRA_CLIENT_SECRET`
+- `JIRA_REDIRECT_URI`
+- `BACKEND_URL`
 
 ## Troubleshooting
 
@@ -160,9 +170,10 @@ The following environment variables should be set in production:
    - Check import paths for typos
 
 2. **API connection issues**:
-   - Verify Jira API credentials in .env file
+   - Verify Jira OAuth credentials in .env file
    - Check network connectivity
    - Ensure Jira API endpoints are correct
+   - Verify OAuth callback URL is correctly configured in Atlassian Developer Console
 
 3. **Hot reloading not working**:
    - Restart the development server
@@ -174,3 +185,5 @@ The following environment variables should be set in production:
 - [Express Documentation](https://expressjs.com/)
 - [Material-UI Documentation](https://mui.com/getting-started/usage/)
 - [Jira REST API Documentation](https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/)
+- [Atlassian OAuth 2.0 Documentation](https://developer.atlassian.com/cloud/jira/platform/oauth-2-3lo-apps/)
+- [JWT Documentation](https://github.com/auth0/node-jsonwebtoken)

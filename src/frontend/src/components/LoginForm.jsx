@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -12,45 +12,30 @@ import Avatar from '@mui/material/Avatar';
 import Link from '@mui/material/Link';
 
 /**
- * Login form component
+ * Login form component for OAuth 2.0 authentication
  * @returns {JSX.Element} - Login form component
  */
 function LoginForm() {
-  const { login, loading, error } = useAuth();
-  const [username, setUsername] = useState('');
-  const [apiToken, setApiToken] = useState('');
+  const { initiateLogin, loading, error } = useAuth();
   const [formError, setFormError] = useState('');
-  const [showHelp, setShowHelp] = useState(false);
+  const location = useLocation();
+
+  // Check for error in URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const errorParam = params.get('error');
+
+    if (errorParam) {
+      setFormError(decodeURIComponent(errorParam));
+    }
+  }, [location]);
 
   /**
-   * Handle form submission
-   * @param {Event} e - Form submit event
+   * Handle login button click
    */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Form validation
-    if (!username.trim()) {
-      setFormError('Username is required');
-      return;
-    }
-    
-    if (!apiToken.trim()) {
-      setFormError('API token is required');
-      return;
-    }
-    
+  const handleLogin = () => {
     setFormError('');
-    
-    try {
-      const result = await login(username, apiToken);
-      
-      if (!result.success) {
-        setFormError(result.message || 'Login failed');
-      }
-    } catch (err) {
-      setFormError(err.message || 'An error occurred during login');
-    }
+    initiateLogin();
   };
 
   return (
@@ -68,98 +53,33 @@ function LoginForm() {
         <Typography component="h1" variant="h5" gutterBottom>
           Sign in with Jira
         </Typography>
-        
+
         {(error || formError) && (
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
             {formError || error}
           </Alert>
         )}
-        
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="username"
-            label="Jira Email or Username"
-            name="username"
-            autoComplete="email"
-            autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            disabled={loading}
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            name="apiToken"
-            label="Jira API Token"
-            type="password"
-            id="apiToken"
-            autoComplete="current-password"
-            value={apiToken}
-            onChange={(e) => setApiToken(e.target.value)}
-            disabled={loading}
-          />
-          
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : 'Sign In'}
-          </Button>
-          
-          <Box sx={{ mt: 2 }}>
-            <Link
-              component="button"
-              variant="body2"
-              onClick={() => setShowHelp(!showHelp)}
-              underline="hover"
-            >
-              {showHelp ? 'Hide help' : 'Need help finding your API token?'}
-            </Link>
-            
-            {showHelp && (
-              <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
-                <Typography variant="body2" paragraph>
-                  To get your Jira API token:
-                </Typography>
-                <ol>
-                  <li>
-                    <Typography variant="body2">
-                      Log in to{' '}
-                      <Link
-                        href="https://id.atlassian.com/manage/api-tokens"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Atlassian API tokens page
-                      </Link>
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="body2">
-                      Click "Create API token"
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="body2">
-                      Enter a label (e.g., "Prestellation App")
-                    </Typography>
-                  </li>
-                  <li>
-                    <Typography variant="body2">
-                      Click "Create" and copy your token
-                    </Typography>
-                  </li>
-                </ol>
-              </Box>
-            )}
-          </Box>
+
+        <Typography variant="body1" align="center" paragraph>
+          Prestellation uses your Jira account for authentication.
+          Click the button below to sign in with your Jira credentials.
+        </Typography>
+
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} /> : 'Sign in with Jira'}
+        </Button>
+
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" color="text.secondary" align="center">
+            You will be redirected to Atlassian to authenticate.
+            Prestellation does not store your Jira password.
+          </Typography>
         </Box>
       </Box>
     </Paper>

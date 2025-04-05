@@ -4,18 +4,25 @@ const authController = require('../controllers/authController');
 const { authenticateToken } = require('../middleware/authMiddleware');
 
 /**
- * @route   POST /api/auth/login
- * @desc    Login with Jira credentials
+ * @route   GET /api/auth/login
+ * @desc    Initiate OAuth 2.0 login flow
  * @access  Public
  */
-router.post('/login', authController.login);
+router.get('/login', authController.login);
 
 /**
- * @route   POST /api/auth/logout
+ * @route   GET /api/auth/callback
+ * @desc    Handle OAuth 2.0 callback from Jira
+ * @access  Public
+ */
+router.get('/callback', authController.handleCallback);
+
+/**
+ * @route   GET /api/auth/logout
  * @desc    Logout user
  * @access  Public
  */
-router.post('/logout', authController.logout);
+router.get('/logout', authController.logout);
 
 /**
  * @route   POST /api/auth/refresh

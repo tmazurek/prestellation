@@ -10,46 +10,31 @@ const api = axios.create({
 });
 
 /**
- * Service for handling authentication operations
+ * Service for handling authentication operations with OAuth 2.0
  */
 const authService = {
   /**
-   * Login with Jira credentials
-   * @param {string} username - Jira username or email
-   * @param {string} apiToken - Jira API token
-   * @returns {Promise<Object>} - Authentication result
+   * Get the login URL for OAuth 2.0 flow
+   * @returns {string} - Login URL
    */
-  async login(username, apiToken) {
-    try {
-      const response = await api.post('/auth/login', {
-        username,
-        apiToken,
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error.response?.data || { 
-        success: false, 
-        message: 'Authentication failed' 
-      };
-    }
+  getLoginUrl() {
+    return '/api/auth/login';
+  },
+
+  /**
+   * Initiate OAuth login by redirecting to Jira
+   */
+  initiateLogin() {
+    // Redirect to the OAuth login endpoint
+    window.location.href = this.getLoginUrl();
   },
 
   /**
    * Logout user
-   * @returns {Promise<Object>} - Logout result
    */
-  async logout() {
-    try {
-      const response = await api.post('/auth/logout');
-      return response.data;
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error.response?.data || { 
-        success: false, 
-        message: 'Logout failed' 
-      };
-    }
+  logout() {
+    // Redirect to the logout endpoint
+    window.location.href = '/api/auth/logout';
   },
 
   /**
@@ -62,9 +47,9 @@ const authService = {
       return response.data;
     } catch (error) {
       console.error('Get current user error:', error);
-      throw error.response?.data || { 
-        success: false, 
-        message: 'Failed to get user data' 
+      throw error.response?.data || {
+        success: false,
+        message: 'Failed to get user data'
       };
     }
   },
@@ -79,9 +64,9 @@ const authService = {
       return response.data;
     } catch (error) {
       console.error('Token refresh error:', error);
-      throw error.response?.data || { 
-        success: false, 
-        message: 'Token refresh failed' 
+      throw error.response?.data || {
+        success: false,
+        message: 'Token refresh failed'
       };
     }
   },
