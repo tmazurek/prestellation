@@ -21,8 +21,13 @@ app.use(morgan('dev'));
 // API Routes
 app.use('/api/health', require('./routes/health'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/jira', require('./routes/jira'));
 
-// TODO: Add Jira API integration routes
+// Error handling middleware
+const { apiErrorHandler } = require('./utils/errorHandler');
+app.use(apiErrorHandler);
+
+// TODO: Add specific feature routes
 // app.use('/api/roadmap', require('./routes/roadmap'));
 // app.use('/api/bugs', require('./routes/bugs'));
 

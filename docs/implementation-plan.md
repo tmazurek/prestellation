@@ -43,12 +43,12 @@ This document outlines the phased implementation plan for the Prestellation proj
 **Goal**: Create a robust integration with the Jira API.
 
 **Tasks**:
-- [ ] 3.1: Implement base Jira API service
-- [ ] 3.2: Create data retrieval functions for projects, epics, and issues
-- [ ] 3.3: Implement data caching mechanism
-- [ ] 3.4: Add data transformation utilities
-- [ ] 3.5: Create error handling for API failures
-- [ ] 3.6: Write tests for API integration
+- [x] 3.1: Implement base Jira API service
+- [x] 3.2: Create data retrieval functions for projects, epics, and issues
+- [x] 3.3: Implement data caching mechanism
+- [x] 3.4: Add data transformation utilities
+- [x] 3.5: Create error handling for API failures
+- [x] 3.6: Write tests for API integration
 
 **Definition of Done**:
 - Application can retrieve data from Jira API
