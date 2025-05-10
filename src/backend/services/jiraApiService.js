@@ -1,6 +1,9 @@
 const axios = require('axios');
-const axiosRetry = require('axios-retry');
+const axiosRetryLib = require('axios-retry');
 const cache = require('memory-cache');
+
+// Fix for axios-retry import
+const axiosRetry = typeof axiosRetryLib === 'function' ? axiosRetryLib : axiosRetryLib.default;
 
 /**
  * Service for interacting with the Jira API
@@ -10,7 +13,7 @@ class JiraApiService {
     this.baseUrl = process.env.JIRA_API_URL;
     this.apiVersion = process.env.JIRA_API_VERSION || '3';
     this.defaultCacheTTL = parseInt(process.env.JIRA_CACHE_TTL || 300000, 10); // 5 minutes in ms
-    
+
     // Create axios instance with retry capability
     this.api = axios.create({
       baseURL: `${this.baseUrl}/rest/api/${this.apiVersion}`,
@@ -20,14 +23,20 @@ class JiraApiService {
         'Content-Type': 'application/json'
       }
     });
-    
+
     // Configure retry behavior
     axiosRetry(this.api, {
       retries: 3,
-      retryDelay: axiosRetry.exponentialDelay,
+      retryDelay: (retryCount) => {
+        // Implement our own exponential delay in case axiosRetry.exponentialDelay is not available
+        return retryCount * 1000; // 1s, 2s, 3s
+      },
       retryCondition: (error) => {
         // Retry on network errors or 5xx server errors
-        return axiosRetry.isNetworkOrIdempotentRequestError(error) || 
+        const isNetworkError = !error.response && Boolean(error.code);
+        const isIdempotentRequestError = error.response && (error.response.status >= 500 || error.response.status === 429);
+
+        return isNetworkError || isIdempotentRequestError ||
                (error.response && error.response.status >= 500);
       }
     });
@@ -57,7 +66,7 @@ class JiraApiService {
     try {
       // Generate cache key based on endpoint and params
       const cacheKey = `jira_${endpoint}_${JSON.stringify(params)}`;
-      
+
       // Check cache if enabled
       if (useCache) {
         const cachedData = cache.get(cacheKey);
@@ -66,18 +75,18 @@ class JiraApiService {
           return cachedData;
         }
       }
-      
+
       // Make API request
       const response = await this.api.get(endpoint, {
         params,
         headers: this.getAuthHeaders(accessToken)
       });
-      
+
       // Cache response if enabled
       if (useCache && response.data) {
         cache.put(cacheKey, response.data, cacheTTL);
       }
-      
+
       return response.data;
     } catch (error) {
       this.handleApiError(error, endpoint);
@@ -97,7 +106,7 @@ class JiraApiService {
       const response = await this.api.post(endpoint, data, {
         headers: this.getAuthHeaders(accessToken)
       });
-      
+
       return response.data;
     } catch (error) {
       this.handleApiError(error, endpoint);
@@ -117,7 +126,7 @@ class JiraApiService {
       const response = await this.api.put(endpoint, data, {
         headers: this.getAuthHeaders(accessToken)
       });
-      
+
       return response.data;
     } catch (error) {
       this.handleApiError(error, endpoint);
@@ -150,16 +159,16 @@ class JiraApiService {
   clearCache(keyPattern) {
     // If no pattern provided, do nothing
     if (!keyPattern) return;
-    
+
     // Get all cache keys
     const keys = Object.keys(cache.exportJson());
-    
+
     // Filter keys matching the pattern
     const matchingKeys = keys.filter(key => key.includes(keyPattern));
-    
+
     // Clear matching keys
     matchingKeys.forEach(key => cache.del(key));
-    
+
     console.log(`Cleared ${matchingKeys.length} cache entries matching "${keyPattern}"`);
   }
 
